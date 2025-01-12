@@ -1,4 +1,4 @@
-# Monero Pool Manager
+# XMR (Monero) Pool Manager
 
 A command-line tool to manage Monero mining pools with features to:
 - View all configured mining pools.
