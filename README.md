@@ -41,3 +41,38 @@ This project is designed to simplify Monero pool management for miners using XMR
 ```bash
 pip install -r requirements.txt
 ```
+
+3. Ensure the config.json file is in the same directory as the script, containing your mining pools. Example:
+```bash
+{
+    "pools": [
+        {
+            "url": "pool.supportxmr.com:443",
+            "user": "YourMoneroAddress",
+            "pass": "worker_name",
+            "rig-id": "rig_id",
+            "tls": true
+        }
+    ]
+}
+```
+
+4. Run the script:
+```bash
+python3 pool-switcher.py
+```
+
+## Commands
+1. Show All Pools: Displays all configured pools from config.json.
+2. Set a Pool on Top: Move a specific pool to the top of the priority list.
+3. Schedule a Pool: Schedule a pool to be automatically prioritized between specific hours.
+4. View Active Schedules: View all active pool prioritization schedules.
+5. Fetch Monero Market Data: Retrieve the current price, market cap, 24-hour trading volume, and circulating supply.
+6. Exit: Exit the application.
+
+## License
+
+This project is licensed under the GNU General Public License (GPL).  
+You are free to use, modify, and distribute this software under the terms of the GPL license.  
+
+For more details, see the [LICENSE](LICENSE) file or visit the [GNU website](https://www.gnu.org/licenses/gpl-3.0.en.html).
