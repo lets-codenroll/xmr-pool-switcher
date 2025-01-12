@@ -1,4 +1,4 @@
-# XMR (Monero) Pool Manager
+# XMR (Monero) Pool Switcher
 
 A command-line tool to manage Monero mining pools with features to:
 - View all configured mining pools.
@@ -33,8 +33,8 @@ This project is designed to simplify Monero pool management for miners using XMR
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/monero-pool-manager.git
-   cd monero-pool-manager
+   git clone https://github.com/lets-codenroll/xmr-pool-switcher.git
+   cd xmr-pool-switcher
    ```
 
 2. Install dependencies:
