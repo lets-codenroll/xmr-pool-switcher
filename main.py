@@ -55,7 +55,7 @@ def is_xmrig_active():
 
 
 def start_xmrig():
-    """Attempt to start xmrig from the parent directory."""
+    """Attempt to start xmrig from the parent directory in the background."""
     try:
         # Resolve the parent directory
         parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -65,9 +65,12 @@ def start_xmrig():
         if not os.path.isfile(xmrig_path):
             raise FileNotFoundError(f"'xmrig' not found at {xmrig_path}")
 
-        print(f"{ORANGE}Starting xmrig from {xmrig_path}...{RESET}")
-        subprocess.Popen([xmrig_path], cwd=parent_dir)
-        print(f"{GREEN}xmrig started successfully.{RESET}")
+        print(f"{ORANGE}Starting xmrig from {xmrig_path} in the background...{RESET}")
+
+        # Start xmrig in the background
+        subprocess.Popen([xmrig_path], cwd=parent_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        print(f"{GREEN}xmrig started successfully in the background.{RESET}")
     except Exception as e:
         print(f"{RED}Failed to start xmrig. Error: {e}{RESET}")
 
