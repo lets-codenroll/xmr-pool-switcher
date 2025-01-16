@@ -8,7 +8,7 @@ from core.scheduler import schedule_pool, view_schedules, run_scheduler
 from utils.helpers import MONERO_LOGO, ORANGE, RESET, RED, GREEN, BOLD
 from utils.monero_data import get_monero_data
 import psutil
-
+import json
 
 def ensure_module(module_name):
     """Check if a module is installed; if not, ask the user to install it."""
@@ -54,9 +54,42 @@ def is_xmrig_active():
     return False
 
 
-def start_xmrig():
-    """Attempt to start xmrig from the parent directory in the background."""
+
+
+def update_background_in_config():
+    """Ensure the 'background' parameter in config.json is set to true."""
     try:
+        # Resolve the parent directory and locate config.json
+        parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        config_path = os.path.join(parent_dir, 'config.json')
+
+        # Load the existing config.json
+        if not os.path.isfile(config_path):
+            raise FileNotFoundError(f"config.json not found at {config_path}")
+
+        with open(config_path, 'r') as file:
+            config = json.load(file)
+
+        # Update the 'background' parameter
+        if config.get("background") != True:
+            config["background"] = True
+            with open(config_path, 'w') as file:
+                json.dump(config, file, indent=4)
+            print(f"{ORANGE}'background' parameter set to true in config.json.{RESET}")
+        else:
+            print(f"{GREEN}'background' parameter is already set to true in config.json.{RESET}")
+        return config_path
+    except Exception as e:
+        print(f"{RED}Failed to update 'background' parameter in config.json. Error: {e}{RESET}")
+        raise
+
+
+def start_xmrig():
+    """Attempt to start xmrig with the 'background' parameter enabled."""
+    try:
+        # Update the config.json background parameter
+        config_path = update_background_in_config()
+
         # Resolve the parent directory
         parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         xmrig_path = os.path.join(parent_dir, 'xmrig')
@@ -65,18 +98,11 @@ def start_xmrig():
         if not os.path.isfile(xmrig_path):
             raise FileNotFoundError(f"'xmrig' not found at {xmrig_path}")
 
-        print(f"{ORANGE}Starting xmrig from {xmrig_path} in the background...{RESET}")
+        print(f"{ORANGE}Starting xmrig from {xmrig_path}...{RESET}")
 
-        # Start xmrig in a new session and detach it
-        subprocess.Popen(
-            [xmrig_path],
-            cwd=parent_dir,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True
-        )
-        
-        print(f"{GREEN}xmrig started successfully in the background.{RESET}")
+        # Start xmrig
+        subprocess.Popen([xmrig_path], cwd=parent_dir)
+        print(f"{GREEN}xmrig started successfully. It is running in the background as configured in config.json.{RESET}")
     except Exception as e:
         print(f"{RED}Failed to start xmrig. Error: {e}{RESET}")
 
