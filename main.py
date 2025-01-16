@@ -39,7 +39,6 @@ def setup_virtual_environment(module_name):
         print(f"Failed to create a virtual environment. Error: {e}")
         sys.exit(1)
 
-
 # Ensure required modules
 required_modules = ['psutil', 'schedule', 'requests']
 for module in required_modules:
