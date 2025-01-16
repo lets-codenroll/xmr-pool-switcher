@@ -54,6 +54,16 @@ def is_xmrig_active():
     return False
 
 
+def start_xmrig():
+    """Attempt to start xmrig."""
+    try:
+        print(f"{ORANGE}Starting xmrig...{RESET}")
+        subprocess.Popen(['./xmrig'], cwd=os.path.dirname(os.path.abspath(__file__)))
+        print(f"{GREEN}xmrig started successfully.{RESET}")
+    except Exception as e:
+        print(f"{RED}Failed to start xmrig. Error: {e}{RESET}")
+
+
 def set_cores(config):
     """Set the number of cores for mining."""
     max_cores = psutil.cpu_count(logical=True)
@@ -96,6 +106,9 @@ def main():
         print(f"{GREEN}xmrig is active and running.{RESET}")
     else:
         print(f"{RED}Warning: xmrig is not currently running.{RESET}")
+        choice = input("Do you want to start xmrig now? (y/n): ").strip().lower()
+        if choice == 'y':
+            start_xmrig()
 
     # Load the configuration file
     config = load_config()
