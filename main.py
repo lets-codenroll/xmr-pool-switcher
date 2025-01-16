@@ -55,13 +55,22 @@ def is_xmrig_active():
 
 
 def start_xmrig():
-    """Attempt to start xmrig."""
+    """Attempt to start xmrig from the parent directory."""
     try:
-        print(f"{ORANGE}Starting xmrig...{RESET}")
-        subprocess.Popen(['./xmrig'], cwd=os.path.dirname(os.path.abspath(__file__)))
+        # Resolve the parent directory
+        parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        xmrig_path = os.path.join(parent_dir, 'xmrig')
+
+        # Check if the xmrig binary exists
+        if not os.path.isfile(xmrig_path):
+            raise FileNotFoundError(f"'xmrig' not found at {xmrig_path}")
+
+        print(f"{ORANGE}Starting xmrig from {xmrig_path}...{RESET}")
+        subprocess.Popen([xmrig_path], cwd=parent_dir)
         print(f"{GREEN}xmrig started successfully.{RESET}")
     except Exception as e:
         print(f"{RED}Failed to start xmrig. Error: {e}{RESET}")
+
 
 
 def set_cores(config):
