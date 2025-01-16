@@ -1,29 +1,36 @@
 import subprocess
 import sys
 import threading
-from core.config_manager import load_config
-from core.pool_manager import show_pools, set_pool_on_top
-from core.scheduler import schedule_pool, view_schedules, run_scheduler
-from utils.helpers import MONERO_LOGO, ORANGE, RESET, RED, BOLD
-
 
 def ensure_module(module_name):
     """Check if a module is installed; if not, ask the user to install it."""
     try:
         __import__(module_name)
     except ModuleNotFoundError:
-        print(f"{RED}Module '{module_name}' is not installed.{RESET}")
+        print(f"Module '{module_name}' is not installed.")
         choice = input(f"Do you want to install '{module_name}' now? (y/n): ").strip().lower()
         if choice == 'y':
             try:
                 subprocess.check_call([sys.executable, '-m', 'pip', 'install', module_name])
-                print(f"{ORANGE}Module '{module_name}' has been installed successfully.{RESET}")
+                print(f"Module '{module_name}' has been installed successfully.")
             except subprocess.CalledProcessError:
-                print(f"{RED}Failed to install '{module_name}'. Please install it manually.{RESET}")
+                print(f"Failed to install '{module_name}'. Please install it manually.")
                 sys.exit(1)
         else:
-            print(f"{RED}Cannot proceed without '{module_name}'. Exiting...{RESET}")
+            print(f"Cannot proceed without '{module_name}'. Exiting...")
             sys.exit(1)
+
+# Ensure required modules
+required_modules = ['psutil', 'schedule', 'requests']
+for module in required_modules:
+    ensure_module(module)
+
+# Import after ensuring all modules are available
+from core.config_manager import load_config
+from core.pool_manager import show_pools, set_pool_on_top
+from core.scheduler import schedule_pool, view_schedules, run_scheduler
+from utils.helpers import MONERO_LOGO, ORANGE, RESET, RED, BOLD
+from utils.monero_data import get_monero_data
 
 
 def show_commands_menu():
@@ -76,7 +83,6 @@ def main():
         elif command == "4":
             view_schedules()
         elif command == "5":
-            from utils.monero_data import get_monero_data
             get_monero_data()
         elif command == "6":
             print(f"{ORANGE}Exiting...{RESET}")
@@ -87,11 +93,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # Ensure required modules are installed
-    required_modules = ['psutil', 'schedule', 'requests']
-    for module in required_modules:
-        ensure_module(module)
-
     # Start the scheduler in a background thread
     scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
     scheduler_thread.start()
