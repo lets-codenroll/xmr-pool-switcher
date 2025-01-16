@@ -11,14 +11,34 @@ def ensure_module(module_name):
         choice = input(f"Do you want to install '{module_name}' now? (y/n): ").strip().lower()
         if choice == 'y':
             try:
-                subprocess.check_call([sys.executable, '-m', 'pip', 'install', module_name])
+                # Try user-level installation
+                subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--user', module_name])
                 print(f"Module '{module_name}' has been installed successfully.")
             except subprocess.CalledProcessError:
-                print(f"Failed to install '{module_name}'. Please install it manually.")
-                sys.exit(1)
+                print(f"Failed to install '{module_name}'. Attempting to guide you with virtual environment setup.")
+                setup_virtual_environment(module_name)
         else:
             print(f"Cannot proceed without '{module_name}'. Exiting...")
             sys.exit(1)
+
+
+def setup_virtual_environment(module_name):
+    """Guide the user to set up a virtual environment and install the required module."""
+    print("It seems your environment is externally managed. Let's set up a virtual environment.")
+    venv_path = "venv"
+    try:
+        # Create and activate a virtual environment
+        subprocess.check_call([sys.executable, '-m', 'venv', venv_path])
+        print("Virtual environment created. Please activate it and rerun this program:")
+        print(f"\n  source {venv_path}/bin/activate   # On Linux/macOS")
+        print(f"  {venv_path}\\Scripts\\activate    # On Windows")
+        print(f"\nOnce activated, install '{module_name}' manually:")
+        print(f"\n  pip install {module_name}")
+        sys.exit(1)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to create a virtual environment. Error: {e}")
+        sys.exit(1)
+
 
 # Ensure required modules
 required_modules = ['psutil', 'schedule', 'requests']
