@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import threading
+import os
 
 def ensure_module(module_name):
     """Check if a module is installed; if not, ask the user to install it."""
@@ -8,35 +9,37 @@ def ensure_module(module_name):
         __import__(module_name)
     except ModuleNotFoundError:
         print(f"Module '{module_name}' is not installed.")
-        choice = input(f"Do you want to install '{module_name}' now? (y/n): ").strip().lower()
+        choice = input(f"Do you want to set up a virtual environment and install '{module_name}'? (y/n): ").strip().lower()
         if choice == 'y':
-            try:
-                # Try user-level installation
-                subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--user', module_name])
-                print(f"Module '{module_name}' has been installed successfully.")
-            except subprocess.CalledProcessError:
-                print(f"Failed to install '{module_name}'. Attempting to guide you with virtual environment setup.")
-                setup_virtual_environment(module_name)
+            setup_virtual_environment_and_install(module_name)
         else:
             print(f"Cannot proceed without '{module_name}'. Exiting...")
             sys.exit(1)
 
 
-def setup_virtual_environment(module_name):
-    """Guide the user to set up a virtual environment and install the required module."""
-    print("It seems your environment is externally managed. Let's set up a virtual environment.")
+def setup_virtual_environment_and_install(module_name):
+    """Create a virtual environment and install the module."""
     venv_path = "venv"
     try:
-        # Create and activate a virtual environment
+        # Create a virtual environment
+        print("Setting up a virtual environment...")
         subprocess.check_call([sys.executable, '-m', 'venv', venv_path])
-        print("Virtual environment created. Please activate it and rerun this program:")
-        print(f"\n  source {venv_path}/bin/activate   # On Linux/macOS")
-        print(f"  {venv_path}\\Scripts\\activate    # On Windows")
-        print(f"\nOnce activated, install '{module_name}' manually:")
-        print(f"\n  pip install {module_name}")
-        sys.exit(1)
+
+        # Activate the virtual environment and install the module
+        pip_executable = os.path.join(venv_path, 'bin', 'pip') if os.name != 'nt' else os.path.join(venv_path, 'Scripts', 'pip')
+        print(f"Installing '{module_name}' in the virtual environment...")
+        subprocess.check_call([pip_executable, 'install', module_name])
+
+        print(f"Module '{module_name}' installed successfully in the virtual environment.")
+        print(f"To activate the environment, run:")
+        if os.name == 'nt':
+            print(f"  {venv_path}\\Scripts\\activate")
+        else:
+            print(f"  source {venv_path}/bin/activate")
+        print(f"Re-run the program within the activated environment.")
+        sys.exit(0)
     except subprocess.CalledProcessError as e:
-        print(f"Failed to create a virtual environment. Error: {e}")
+        print(f"Failed to set up the virtual environment or install '{module_name}'. Error: {e}")
         sys.exit(1)
 
 # Ensure required modules
