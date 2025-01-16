@@ -7,21 +7,21 @@ import time
 import requests
 
 
-# Path to the config.json file
-CONFIG_FILE = "config.json"
-schedules = []  # To store cron-like jobs
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_FILE = os.path.join(os.path.dirname(BASE_DIR), "config.json") 
+print(f"Looking for config.json at: {CONFIG_FILE}")
+
+schedules = []
 COINGECKO_URL = "https://api.coingecko.com/api/v3/coins/monero"
 
-# ANSI color codes
 RESET = "\033[0m"
 CYAN = "\033[96m"
 GREEN = "\033[92m"
-ORANGE = "\033[38;2;255;102;0m"  # Custom orange color (#ff6600)
+ORANGE = "\033[38;2;255;102;0m"
 MAGENTA = "\033[95m"
 RED = "\033[91m"
 BOLD = "\033[1m"
 
-# Monero ASCII Art Logo
 MONERO_LOGO = f"""
 {ORANGE}                  -===========-
              -=====================-        
@@ -50,7 +50,6 @@ MONERO_LOGO = f"""
                     *********
 """
 
-
 def load_config():
     """Load the configuration from the config.json file."""
     if not os.path.exists(CONFIG_FILE):
@@ -58,7 +57,6 @@ def load_config():
         return None
     with open(CONFIG_FILE, "r") as file:
         return json.load(file)
-
 
 def save_config(config):
     """Save the updated configuration to the config.json file."""
