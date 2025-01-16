@@ -67,8 +67,14 @@ def start_xmrig():
 
         print(f"{ORANGE}Starting xmrig from {xmrig_path} in the background...{RESET}")
 
-        # Start xmrig in the background
-        subprocess.Popen([xmrig_path], cwd=parent_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Start xmrig in a new session and detach it
+        subprocess.Popen(
+            [xmrig_path],
+            cwd=parent_dir,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True
+        )
         
         print(f"{GREEN}xmrig started successfully in the background.{RESET}")
     except Exception as e:
