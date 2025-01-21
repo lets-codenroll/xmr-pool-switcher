@@ -10,6 +10,50 @@ from utils.monero_data import get_monero_data
 import psutil
 import json
 
+
+def create_and_setup_virtualenv(required_modules):
+    """Create a virtual environment and install required modules."""
+    venv_path = "venv"
+
+    try:
+        # Check if the virtual environment already exists
+        if not os.path.exists(venv_path):
+            print("Setting up a virtual environment...")
+            subprocess.check_call([sys.executable, "-m", "venv", venv_path])
+            print("Virtual environment created successfully.")
+
+        # Activate the virtual environment
+        pip_executable = os.path.join(venv_path, "bin", "pip") if os.name != "nt" else os.path.join(venv_path, "Scripts", "pip")
+
+        # Install required modules
+        print("Installing required modules...")
+        subprocess.check_call([pip_executable, "install", "--upgrade", "pip"])  # Upgrade pip in venv
+        for module in required_modules:
+            subprocess.check_call([pip_executable, "install", module])
+        print("All required modules installed successfully.")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to set up the virtual environment or install modules. Error: {e}")
+        sys.exit(1)
+
+
+def ensure_environment():
+    """Ensure the virtual environment and required modules are available."""
+    venv_path = "venv"
+
+    # If virtual environment exists, ensure we're using it
+    if os.path.exists(venv_path):
+        venv_python = os.path.join(venv_path, "bin", "python") if os.name != "nt" else os.path.join(venv_path, "Scripts", "python")
+
+        # Check if the current Python executable is the one in the venv
+        if sys.executable != os.path.abspath(venv_python):
+            print("Activating virtual environment...")
+            os.execl(venv_python, venv_python, *sys.argv)
+    else:
+        # Create and set up the virtual environment
+        required_modules = ["psutil", "schedule", "requests"]
+        create_and_setup_virtualenv(required_modules)
+
 def ensure_module(module_name):
     """Check if a module is installed; if not, ask the user to install it."""
     try:
@@ -200,9 +244,7 @@ def main():
 
 
 if __name__ == "__main__":
-    required_modules = ['psutil', 'schedule', 'requests']
-    for module in required_modules:
-        ensure_module(module)
+    ensure_environment()
 
     scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
     scheduler_thread.start()
