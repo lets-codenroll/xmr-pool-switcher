@@ -54,41 +54,6 @@ def ensure_environment():
         required_modules = ["psutil", "schedule", "requests"]
         create_and_setup_virtualenv(required_modules)
 
-def ensure_module(module_name):
-    """Check if a module is installed; if not, ask the user to install it."""
-    try:
-        __import__(module_name)
-    except ModuleNotFoundError:
-        print(f"Module '{module_name}' is not installed.")
-        choice = input(f"Do you want to set up a virtual environment and install '{module_name}'? (y/n): ").strip().lower()
-        if choice == 'y':
-            setup_virtual_environment_and_install(module_name)
-        else:
-            print(f"Cannot proceed without '{module_name}'. Exiting...")
-            sys.exit(1)
-
-
-def setup_virtual_environment_and_install(module_name):
-    """Create a virtual environment and install the module."""
-    venv_path = "venv"
-    try:
-        print("Setting up a virtual environment...")
-        subprocess.check_call([sys.executable, '-m', 'venv', venv_path])
-        pip_executable = os.path.join(venv_path, 'bin', 'pip') if os.name != 'nt' else os.path.join(venv_path, 'Scripts', 'pip')
-        print(f"Installing '{module_name}' in the virtual environment...")
-        subprocess.check_call([pip_executable, 'install', module_name])
-        print(f"Module '{module_name}' installed successfully in the virtual environment.")
-        print(f"To activate the environment, run:")
-        if os.name == 'nt':
-            print(f"  {venv_path}\\Scripts\\activate")
-        else:
-            print(f"  source {venv_path}/bin/activate")
-        print(f"Re-run the program within the activated environment.")
-        sys.exit(0)
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to set up the virtual environment or install '{module_name}'. Error: {e}")
-        sys.exit(1)
-
 
 def is_xmrig_active():
     """Check if xmrig is currently active."""
@@ -96,9 +61,6 @@ def is_xmrig_active():
         if 'xmrig' in proc.info['name'].lower():
             return True
     return False
-
-
-
 
 def update_background_in_config():
     """Ensure the 'background' parameter in config.json is set to true."""
@@ -127,7 +89,6 @@ def update_background_in_config():
         print(f"{RED}Failed to update 'background' parameter in config.json. Error: {e}{RESET}")
         raise
 
-
 def start_xmrig():
     """Attempt to start xmrig with the 'background' parameter enabled."""
     try:
@@ -151,7 +112,6 @@ def start_xmrig():
         print(f"{RED}Failed to start xmrig. Error: {e}{RESET}")
 
 
-
 def set_cores(config):
     """Set the number of cores for mining."""
     max_cores = psutil.cpu_count(logical=True)
@@ -171,7 +131,6 @@ def set_cores(config):
     except ValueError as e:
         print(f"{RED}Error: {e}. Please enter a valid number.{RESET}")
 
-
 def show_commands_menu():
     """Display the commands menu."""
     print(f"\n{BOLD}Commands:{RESET}")
@@ -183,7 +142,6 @@ def show_commands_menu():
     print(f"{ORANGE}5. Get Monero market data{RESET}")
     print(f"6. Set number of cores for mining")
     print(f"{BOLD}7. Exit{RESET}")
-
 
 def main():
     """Main function to handle user input and commands."""
